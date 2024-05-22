@@ -1,45 +1,17 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+// src/App.tsx
+import React from 'react';
+import UserForm from './components/UserForm';
+import UserDetails from './components/UserDetails';
+import UserList from './components/UserList';
 
-// Define the interface representing the shape of your user data
-interface User {
-  id: number;
-  name: string;
-  dob: string;
-  contact: string;
-  email: string;
-  description: string;
-}
-
-const App = () => {
-  // Annotate the users state with the User interface
-  const [users, setUsers] = useState<User[]>([]);
-
-  useEffect(() => {
-    axios.get("/api/users")
-      .then((res) => {
-        // Ensure that res.data is an array of User objects
-        setUsers(res.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching user data:', error);
-      });
-  },[]);
-
+const App: React.FC = () => {
   return (
-    <>
-      <h1>Users List</h1>
-      <p>Users: {users.length}</p>
-      {users.map((user) => (
-        <div key={user.id}>
-          <h2>{user.name}</h2>
-          <p>Date of Birth: {user.dob}</p>
-          <p>Contact: {user.contact}</p>
-          <p>Email: {user.email}</p>
-          <p>Description: {user.description}</p>
-        </div>
-      ))}
-    </>
+    <div className="App">
+      <h1>User Dashboard</h1>
+      <UserForm />
+      {/* <UserList /> */}
+      {/* <UserDetails /> */}
+    </div>
   );
 }
 
