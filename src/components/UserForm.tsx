@@ -1,72 +1,127 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
+import '../Styles.css';
 
-interface UserFormData {
-  name: string;
-  dob: string;
-  contact: string;
-  email: string;
-  description: string;
-}
+// Custom CSS styles for toast notifications
+const toastContainerStyle = {
+  width: '20%',
+  padding: '26px',
+  borderRadius: '8px',
+};
+
+const toastStyle = {
+  fontSize: '16px',
+};
 
 const UserForm: React.FC = () => {
-  const initialFormData: UserFormData = {
+  const initialFormData = {
     name: '',
     dob: '',
     contact: '',
     email: '',
-    description: ''
+    description: '',
   };
 
-  const [formData, setFormData] = useState<UserFormData>(initialFormData);
-  const [error, setError] = useState<string>('');
+  const [formData, setFormData] = useState(initialFormData);
+  const navigate = useNavigate(); // Get the navigate function from React Router
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost/3001/api/users', formData);
+      const response = await axios.post('http://localhost:3001/api/users', formData);
       console.log('User created:', response.data);
-      setFormData(initialFormData); // Reset form after successful submission
-      setError(''); // Clear any previous error
+      toast.success('User created successfully', { style: toastStyle });
+      setFormData(initialFormData);
+      setTimeout(() => {
+        navigate('/'); 
+      }, 3000); 
     } catch (error) {
       console.error('Error creating user:', error);
-      setError('Error creating user. Please try again.'); // Set error message
+      toast.error('Error creating user. Please try again.', { style: toastStyle }); 
     }
   };
+  
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Name:</label>
-        <input type="text" name="name" value={formData.name} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Date of Birth:</label>
-        <input type="date" name="dob" value={formData.dob} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Contact:</label>
-        <input type="text" name="contact" value={formData.contact} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Email:</label>
-        <input type="email" name="email" value={formData.email} onChange={handleChange} required />
-      </div>
-      <div>
-        <label>Description:</label>
-        <textarea name="description" value={formData.description} onChange={handleChange} required />
-      </div>
-      {error && <div style={{ color: 'red' }}>{error}</div>} {/* Display error message */}
-      <button type="submit">Create User</button>
-    </form>
+    <div className="main">
+      <ToastContainer
+        style={toastContainerStyle}
+        bodyClassName="toast-body"
+        position="top-right"
+        autoClose={3000}
+        closeOnClick
+        pauseOnHover
+      />
+      <form onSubmit={handleSubmit}>
+        <h1 className="user">User Form</h1>
+        <div className="form-group">
+          <label>Name:</label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Name"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Date of Birth:</label>
+          <input
+            type="date"
+            name="dob"
+            value={formData.dob}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Contact:</label>
+          <input
+            type="text"
+            name="contact"
+            value={formData.contact}
+            onChange={handleChange}
+            placeholder="Contact Number"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Email:</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Email"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Description:</label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Description"
+            required
+            style={{ resize: 'none' }}
+          />
+        </div>
+        <button className='btn1' type="submit">Create User</button>
+      </form>
+    </div>
   );
 };
 

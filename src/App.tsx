@@ -1,16 +1,17 @@
-// src/App.tsx
 import React from 'react';
-import UserForm from './components/UserForm';
-import UserDetails from './components/UserDetails';
+import { Routes, Route } from 'react-router-dom';
 import UserList from './components/UserList';
+import UserDetails from './components/UserDetails';
+import UserForm from './components/UserForm';
 
 const App: React.FC = () => {
   return (
     <div className="App">
-      <h1>User Dashboard</h1>
-      <UserForm />
-      {/* <UserList /> */}
-      {/* <UserDetails /> */}
+      <Routes>
+        <Route path="/" element={<UserList />} />
+        <Route path="user/:userId" element={<UserDetails />} />
+        <Route path="user-form" element={<UserForm />} />
+      </Routes>
     </div>
   );
 }

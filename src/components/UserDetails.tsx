@@ -1,48 +1,119 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useParams, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-// Define the interface representing the shape of your user data
 interface User {
-  id: number;
+  _id: string;
   name: string;
-  dob: string; // Changed type to string
+  dob: string;
   contact: string;
   email: string;
   description: string;
 }
 
-const App = () => {
-  const [users, setUsers] = useState<User[]>([]);
+const UserDetails: React.FC = () => {
+  const { userId } = useParams<{ userId: string }>();
+  const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
+  
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState<User | null>(null);
 
   useEffect(() => {
-    axios.get("/api/users")
-      .then((res) => {
-        const formattedUsers = res.data.map((user: User) => ({
-          ...user,
-          dob: new Date(user.dob).toLocaleDateString(), // Format dob without timezone
-        }));
-        setUsers(formattedUsers);
-      })
-      .catch((error) => {
-        console.error('Error fetching user data:', error);
-      });
-  }, []);
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`/api/users/${userId}`);
+        const userData: User = response.data;
+        setUser(userData);
+        setFormData(userData);
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+        toast.error('Error fetching user details. Please try again.');
+      }
+    };
+    fetchUser();
+  }, [userId]);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prevState => ({ ...prevState!, [name]: value }));
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      await axios.put(`/api/users/${userId}`, formData);
+      setUser(formData);
+      setIsEditing(false);
+      toast.success('User updated successfully');
+    } catch (error) {
+      console.error('Error updating user:', error);
+      toast.error('Error updating user. Please try again.');
+    }
+  };
+
+  const handleDeleteClick = async () => {
+    try {
+      await axios.delete(`/api/users/${userId}`);
+      toast.success('User deleted successfully');
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error('Error deleting user. Please try again.');
+    }
+  };
+
+  if (!user || !formData) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <>
-      <h1>Users List</h1>
-      <p>Users: {users.length}</p>
-      {users.map((user, index) => (
-        <div key={index}> 
-          <h2>{user.name}</h2>
+    <div>
+      <h1>User Details</h1>
+      {isEditing ? (
+        <form onSubmit={handleFormSubmit}>
+          <label>
+            Name:
+            <input type="text" name="name" value={formData.name} onChange={handleInputChange} />
+          </label>
+          <label>
+            Date of Birth:
+            <input type="date" name="dob" value={formData.dob} onChange={handleInputChange} />
+          </label>
+          <label>
+            Contact:
+            <input type="text" name="contact" value={formData.contact} onChange={handleInputChange} />
+          </label>
+          <label>
+            Email:
+            <input type="email" name="email" value={formData.email} onChange={handleInputChange} />
+          </label>
+          <label>
+          Description:
+            <textarea name="description" value={formData.description} onChange={handleInputChange}></textarea>
+          </label>
+          <button type="submit">Save</button>
+        </form>
+      ) : (
+        <div>
+          <p>Name: {user.name}</p>
           <p>Date of Birth: {user.dob}</p>
           <p>Contact: {user.contact}</p>
           <p>Email: {user.email}</p>
           <p>Description: {user.description}</p>
+          <button onClick={handleEditClick}>Edit</button>
+          <button onClick={handleDeleteClick}>Delete</button>
         </div>
-      ))}
-    </>
+      )}
+      <ToastContainer />
+    </div>
   );
-}
+};
 
-export default App;
+export default UserDetails;

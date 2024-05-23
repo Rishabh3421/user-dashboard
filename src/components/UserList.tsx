@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Link, useNavigate } from 'react-router-dom'; 
+import "../Styles.css";
 
 interface User {
   _id: string;
@@ -10,12 +14,54 @@ interface User {
   description: string;
 }
 
+interface PaginationProps {
+  totalItems: number;
+  itemsPerPage: number;
+  currentPage: number;
+  onPageChange: (newPage: number) => void;
+}
+
+const Pagination: React.FC<PaginationProps> = ({ totalItems, itemsPerPage, currentPage, onPageChange }) => {
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      onPageChange(newPage);
+    }
+  };
+
+  
+
+  return (
+    <nav>
+      <ul className='paginationBtn'>
+        <li>
+          <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>{'<'}</button>
+        </li>
+        {Array.from({ length: totalPages }).map((_, index) => (
+          <li key={index}>
+            <button onClick={() => handlePageChange(index + 1)}>{index + 1 === currentPage ? currentPage : index + 1}</button>
+          </li>
+        ))}
+        <li>
+          <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>{'>'}</button>
+        </li>
+      </ul>
+    </nav>
+  );
+};
+
 const UserList: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [usersPerPage] = useState(10); // Number of users per page
+  const [usersPerPage] = useState(10);
+  const navigate = useNavigate();
+
+  const navigateToUserForm = () => {
+    navigate('/user-form');
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -30,58 +76,70 @@ const UserList: React.FC = () => {
     fetchUsers();
   }, []);
 
-  // Pagination
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-
-  // Change page
-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
-
-  // Filter users
   useEffect(() => {
     const filtered = users.filter(user =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredUsers(filtered);
-    setCurrentPage(1); // Reset to first page when search term changes
   }, [searchTerm, users]);
+  
 
-  // Function to format date
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  const deleteUser = async (userId: string) => {
+    try {
+      await axios.delete(`/api/users/${userId}`);
+      setUsers(users.filter(user => user._id !== userId));
+      setFilteredUsers(filteredUsers.filter(user => user._id !== userId));
+      toast.success('User deleted successfully');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast.error('Error deleting user. Please try again.');
+    }
   };
 
   return (
-    <div>
-      <input
+    <div className='userContainer'>
+     <div className="inputContainer">
+     <input
+        className='userSearchInput'
         type="text"
         placeholder="Search users..."
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
       />
-      <ul>
-        {currentUsers.map(user => (
-          <li key={user._id}>
-            <div>Name: {user.name}</div>
-            <div>Date of Birth: {formatDate(user.dob)}</div>
-            <div>Contact: {user.contact}</div>
-            <div>Email: {user.email}</div>
-            <div>Description: {user.description}</div>
-          </li>
-        ))}
-      </ul>
-      {/* Pagination */}
-      <nav>
-        <ul>
-          {Array.from({ length: Math.ceil(filteredUsers.length / usersPerPage) }).map((_, index) => (
-            <li key={index}>
-              <button onClick={() => paginate(index + 1)}>{index + 1}</button>
+       <button onClick={navigateToUserForm}>Create User</button>
+     </div>
+      {currentUsers.length > 0 ? (
+        <ul className='cardContainer'>
+          {currentUsers.map(user => (
+            <li className='userCards' key={user._id}>
+              <div className="cardContent" onClick={() => navigate(`/user/${user._id}`)}>
+                <div>Name: {user.name}</div>
+                <div>Contact: {user.contact}</div>
+                <div>Email: {user.email}</div>
+              </div>
+              <div className="cardButtons">
+                <button onClick={() => deleteUser(user._id)}>Delete</button>
+                <Link to={`/user/${user._id}`} className='userDetailsLink'>Update</Link>
+              </div>
             </li>
           ))}
         </ul>
-      </nav>
+      ) : (
+        <div>No users found.</div>
+      )}
+      {filteredUsers.length > usersPerPage && (
+        <Pagination
+          totalItems={filteredUsers.length}
+          itemsPerPage={usersPerPage}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+        />
+      )}
+      <ToastContainer />
     </div>
   );
 };

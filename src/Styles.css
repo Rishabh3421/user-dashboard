@@ -1,0 +1,176 @@
+/* styles.css */
+
+/* Form Style */
+.main{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #dadada;
+  width: 100vw;
+  height: 100vh;
+}
+
+.user{
+  text-align: center;
+}
+form{
+  min-width: 25%;
+  border-radius: 5%;
+  background:#FFFFFF;
+  padding: 70px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+}
+.form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+  
+  .btn1 {
+    padding: 10px 15px;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 20px;
+  }
+  
+  .btn1[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+  }
+  
+  .btn1:hover {
+    opacity: 0.9;
+  }
+  .userContainer {
+    background: beige;
+    min-height: 100vh;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 5vh;
+  }
+  
+  .userContainer > input {
+    width: 50%; /* Adjust width of search input */
+    padding: 15px 20px; /* Increase padding for better appearance */
+    border-radius: 30px;
+    border: none;
+    margin-top: 10px;
+  }
+  
+  .cardContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center; /* Align cards in the center */
+  }
+  
+  .userCards {
+    border: 1px solid black;
+    list-style: none;
+    padding: 20px;
+    width: 250px;
+    background: #eeecec;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column; 
+    justify-content: space-between; 
+  }
+  
+  .userCards > div {
+    margin-bottom: 8px; 
+  }
+  
+  .userCards > button {
+    margin-top: auto; 
+  }
+  
+  .userCards > button:first-child {
+    margin-right: 5px; 
+  }
+  .cardButtons{
+    display: flex;
+    gap: 10px;
+  }
+  .cardButtons>button{
+   cursor: pointer;
+  }
+  
+  .cardButtons>button:nth-child(1){
+   background: red;
+   font: bold;
+   color: whitesmoke;
+   border: none;
+   border-radius: 5px;
+   padding: 10px 15px;
+  }
+  .cardButtons>button:nth-child(1):hover{
+   background: rgba(238, 51, 51, 0.802);
+
+  }
+  .cardButtons>button:nth-child(2):hover{
+   background:rgba(57, 57, 225, 0.875);
+
+  }
+  .userDetailsLink{
+   background: #1B95FF;
+   font: bold;
+   color: whitesmoke;
+   border: none;
+   border-radius: 5px;
+   padding: 10px 15px;
+  }
+
+  .paginationBtn{
+    display: flex;
+    gap: 20px;
+  }
+  .paginationBtn>li{
+    list-style: none;
+  }
+  .paginationBtn>li>button{
+    border-radius: 100%;
+    height: 50px;
+    width: 50px;
+    cursor: pointer;
+    background: #1B95FF;
+    border: none;
+    color: #fff;
+  }
+  .inputContainer{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    width: 80%;
+    justify-content: space-between;
+  }
+  .inputContainer > input {
+    width: 50%; 
+    padding: 15px 20px;
+    border-radius: 30px;
+    border: none;
+    margin-top: 10px;
+  }
+
+  .inputContainer>button{
+    background: #1B95FF;
+    font: bold;
+    color: whitesmoke;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 30px;
+    cursor: pointer;
+   }
