@@ -3,7 +3,10 @@ import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link, useNavigate } from 'react-router-dom'; 
+import 'react-confirm-alert/src/react-confirm-alert.css'; 
+import { confirmAlert } from 'react-confirm-alert';
 import "../Styles.css";
+import UserLogo from './UserIcon'; 
 
 interface User {
   _id: string;
@@ -29,8 +32,6 @@ const Pagination: React.FC<PaginationProps> = ({ totalItems, itemsPerPage, curre
       onPageChange(newPage);
     }
   };
-
-  
 
   return (
     <nav>
@@ -82,7 +83,6 @@ const UserList: React.FC = () => {
     );
     setFilteredUsers(filtered);
   }, [searchTerm, users]);
-  
 
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
@@ -100,30 +100,50 @@ const UserList: React.FC = () => {
     }
   };
 
+  const confirmDelete = (userId: string) => {
+    confirmAlert({
+      title: 'Confirm to delete',
+      message: 'Are you sure you want to delete this user?',
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: () => deleteUser(userId)
+        },
+        {
+          label: 'No',
+          onClick: () => {}
+        }
+      ]
+    });
+  };
+
   return (
     <div className='userContainer'>
-     <div className="inputContainer">
-     <input
-        className='userSearchInput'
-        type="text"
-        placeholder="Search users..."
-        value={searchTerm}
-        onChange={e => setSearchTerm(e.target.value)}
-      />
-       <button onClick={navigateToUserForm}>Create User</button>
-     </div>
+      <div className="inputContainer">
+        <input
+          className='userSearchInput'
+          type="text"
+          placeholder="Search users..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+        />
+        <button onClick={navigateToUserForm}>Create User</button>
+      </div>
       {currentUsers.length > 0 ? (
         <ul className='cardContainer'>
           {currentUsers.map(user => (
             <li className='userCards' key={user._id}>
               <div className="cardContent" onClick={() => navigate(`/user/${user._id}`)}>
-                <div>Name: {user.name}</div>
-                <div>Contact: {user.contact}</div>
-                <div>Email: {user.email}</div>
+                {/* Display User Logo */}
+                <UserLogo name={user.name} />
+                <div><span>Name:</span> {user.name}</div>
+                {/* <div>Contact: {user.contact}</div> */}
+                <div><span>Email:</span> {user.email}</div>
+                <div>{user.description}</div>
               </div>
               <div className="cardButtons">
-                <button onClick={() => deleteUser(user._id)}>Delete</button>
-                <Link to={`/user/${user._id}`} className='userDetailsLink'>Update</Link>
+                <button className='DeleteBtn' onClick={() => confirmDelete(user._id)}>Delete</button>
+                {/* <Link to={`/user/${user._id}`} className='userDetailsLink'>Update</Link> */}
               </div>
             </li>
           ))}
